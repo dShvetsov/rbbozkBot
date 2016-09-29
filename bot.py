@@ -29,14 +29,14 @@ def getUnread():
 
 @bot.message_handler(content_types=["text"])
 def handler(message):
-   user_id = message.chat.id
-   global  state, ret, users, d
-   if not user_id in users.keys():
+    user_id = message.chat.id
+    global  state, ret, users, d
+    if not user_id in users.keys():
         users[user_id] = "untrusted"
         bot.send_message(user_id, "Hello,  please input password")
         print ("new users detected, waiting password")
         return
-   elif users[user_id] == 'untrusted' :
+    elif users[user_id] == 'untrusted' :
         if check(message.text) :
             users[user_id] = 'trusted'
             bot.send_message(user_id, "Welcome")
@@ -46,25 +46,25 @@ def handler(message):
             bot.send_message(user_id, "Wrong password, try again")
             print ("wrong password")
             return
-   elif users[user_id] != 'trusted' :
+    elif users[user_id] != 'trusted' :
         print ("error")
         return
 
-   if (message.text == 'get') :
+    if (message.text == 'get') :
         ret = getUnread()
         print (ret)
         state = "expect result"
         bot.send_message(user_id, ret)
-   elif state == "expect result" :
+    elif state == "expect result" :
         if message.text == 'done' : 
             d[ret] = 'yes'
             print (ret + " done")
             bot.send_message(user_id, "ok, you read this message")
 
-   if message.text == 'dump' : 
+    if message.text == 'dump' :
         json.dump(d, open('./dict.dmp', 'w'))
         print ("dumped")
         bot.send_message(user_id, "file dumped")
 
 if __name__ == '__main__':
-    bot.polling(none_stop=True)
+     bot.polling(none_stop=True)
