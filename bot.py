@@ -10,11 +10,15 @@ URL = "https://api.telegram.org/bot%s" % BOT_TOKEN
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
+def check(pswd) :
+    return pswd == password() # TODO hash password
 
 d = json.load(open('./dict.dmp'))
 ret = None
 
 state = 'init'
+
+users = {}
 
 def getUnread():
     global d
@@ -25,15 +29,42 @@ def getUnread():
 
 @bot.message_handler(content_types=["text"])
 def handler(message):
-   global  state, ret
+   user_id = message.chat.id
+   global  state, ret, users, d
+   if not user_id in users.keys():
+        users[user_id] = "untrusted"
+        bot.send_message(user_id, "Hello,  please input password")
+        print ("new users detected, waiting password")
+        return
+   elif users[user_id] == 'untrusted' :
+        if check(message.text) :
+            users[user_id] = 'trusted'
+            bot.send_message(user_id, "Welcome")
+            print ("user accepted")
+            return
+        else :
+            bot.send_message(user_id, "Wrong password, try again")
+            print ("wrong password")
+            return
+   elif users[user_id] != 'trusted' :
+        print ("error")
+        return
+
    if (message.text == 'get') :
         ret = getUnread()
         print (ret)
         state = "expect result"
-        bot.send_message(message.chat.id, ret)
+        bot.send_message(user_id, ret)
    elif state == "expect result" :
         if message.text == 'done' : 
             d[ret] = 'yes'
+            print (ret + " done")
+            bot.send_message(user_id, "ok, you read this message")
+
+   if message.text == 'dump' : 
+        json.dump(d, open('./dict.dmp', 'w'))
+        print ("dumped")
+        bot.send_message(user_id, "file dumped")
 
 if __name__ == '__main__':
     bot.polling(none_stop=True)
