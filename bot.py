@@ -50,18 +50,18 @@ def handler(message):
         print ("error")
         return
 
-    if (message.text == 'get') :
+    if (message.text.lower() == 'get') :
         ret = getUnread()
         print (ret)
         state = "expect result"
         bot.send_message(user_id, ret)
     elif state == "expect result" :
-        if message.text == 'done' : 
+        if message.text.lower() == 'done' :
             d[ret] = 'yes'
             print (ret + " done")
             bot.send_message(user_id, "ok, you read this message")
 
-    if message.text == 'dump' :
+    if message.text.lower() == 'dump' :
         json.dump(d, open('./dict.dmp', 'w'))
         print ("dumped")
         bot.send_message(user_id, "file dumped")
