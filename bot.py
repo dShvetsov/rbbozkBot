@@ -71,5 +71,10 @@ def handler(message):
     if message.text.lower() == 'ping' :
         bot.send_message(user_id, 'pong')
 
+    if message.text.lower() == 'count' :
+        unread = [ x if d[x]  == 'no' else None for x in d ]
+        unread = filter( lambda x : x is not None , unread )
+        bot.send_message(user_id, "count is : " + str(len(unread)))
+
 if __name__ == '__main__':
      bot.polling(none_stop=True)
