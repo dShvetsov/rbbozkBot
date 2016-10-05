@@ -73,7 +73,7 @@ def handler(message):
 
     if message.text.lower() == 'count' :
         unread = [ x if d[x]  == 'no' else None for x in d ]
-        unread = filter( lambda x : x is not None , unread )
+        unread = list( filter( lambda x : x is not None , unread ) )
         bot.send_message(user_id, "count is : " + str(len(unread)))
 
 if __name__ == '__main__':
