@@ -23,7 +23,7 @@ users = {}
 def getUnread():
     global d
     unread = [ x if d[x]  == 'no' else None for x in d ]
-    filter( lambda x : x is not None , unread )
+    unread = list( filter( lambda x : x is not None , unread ))
     n = randint(0, len(unread) - 1)
     return unread[ n ]
 
