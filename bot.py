@@ -60,11 +60,21 @@ def handler(message):
             d[ret] = 'yes'
             print (ret + " done")
             bot.send_message(user_id, "ok, you read this message")
+        elif message.text.lower() == 'repeat' :
+            bot.send_message(user_id, ret)
 
     if message.text.lower() == 'dump' :
         json.dump(d, open('./dict.dmp', 'w'))
         print ("dumped")
         bot.send_message(user_id, "file dumped")
+
+    if message.text.lower() == 'ping' :
+        bot.send_message(user_id, 'pong')
+
+    if message.text.lower() == 'count' :
+        unread = [ x if d[x]  == 'no' else None for x in d ]
+        unread = list( filter( lambda x : x is not None , unread ) )
+        bot.send_message(user_id, "count is : " + str(len(unread)))
 
 if __name__ == '__main__':
      bot.polling(none_stop=True)
