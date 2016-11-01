@@ -19,6 +19,7 @@ ret = None
 state = 'init'
 
 users = {}
+count = 0
 
 def getUnread():
     global d
@@ -30,7 +31,7 @@ def getUnread():
 @bot.message_handler(content_types=["text"])
 def handler(message):
     user_id = message.chat.id
-    global  state, ret, users, d
+    global  state, ret, users, d, count
     if not user_id in users.keys():
         users[user_id] = "untrusted"
         bot.send_message(user_id, "Hello,  please input password")
@@ -60,6 +61,10 @@ def handler(message):
             d[ret] = 'yes'
             print (ret + " done")
             bot.send_message(user_id, "ok, you read this message")
+            count += 1
+            if count > 10 :
+                json.dump(d, open('./dict.dmp','w'))
+                count = 0
         elif message.text.lower() == 'repeat' :
             bot.send_message(user_id, ret)
 
