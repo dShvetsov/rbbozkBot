@@ -1,7 +1,9 @@
 #!/bin/python3
 from random import randint
+import urllib3
 import telebot
 import json
+import re
 from mytoken import TOKEN, password
 
 BOT_TOKEN = TOKEN()
@@ -80,6 +82,38 @@ def handler(message):
         unread = [ x if d[x]  == 'no' else None for x in d ]
         unread = list( filter( lambda x : x is not None , unread ) )
         bot.send_message(user_id, "count is : " + str(len(unread)))
+
+    if message.text == 'update' :
+        update()
+        print ("updated")
+        bot.send_message(user_id, "new article retrivied")
+
+def update():
+    global d
+    pattern = re.compile(r'href=[\'"]?([^\'" >]+)')
+    pagename = "https://habrahabr.ru/users/rbbozk/favorites/page"
+    i = 0
+    http = urllib3.PoolManager()
+    while (True) :
+        i += 1
+        print ("page number ", i)
+        response = http.request('GET', pagename + str(i))
+        if response.status != 200 :
+            return
+        html = response.read().decode('utf-8')
+        lines = html.splitlines()
+        lines = filter(lambda x : x.find('class="post__title_link"') != -1, lines)
+        lines = [i for i in lines]
+        if len(lines) == 0 :
+            return
+        for l in lines :
+            link = pattern.search(l).group(1)
+            link += '\n'
+            print (link)
+            if link in d.keys() :
+                return
+            else  :
+                d[link] = 'no'
 
 if __name__ == '__main__':
      bot.polling(none_stop=True)
